@@ -11,7 +11,8 @@ builder.Services.AddStackExchangeRedisCache(options =>
     options.Configuration = "localhost:6379";
     options.InstanceName = "SampleInstance";
 });
-
+builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+builder.Services.AddSingleton<BaseUrlService>();
 builder.Services.AddSingleton<IUrlShortener, Base62ShortUrl>();
 builder.Services.AddSingleton<TinyUrlService>();
 
@@ -27,7 +28,7 @@ app.MapControllers();
 
 app.Map("/{shortUrl}", (context) => {
     var tinyUrlService = app.Services.GetService<TinyUrlService>();
-    var shortUrl = context.Request.RouteValues["shortUrl"]?.ToString();
+    var shortUrl = $"{context.Request.Scheme}://{context.Request.Host}{context.Request.Path}{context.Request.QueryString}";
     var fullUrl = tinyUrlService.GetFullUrl(shortUrl);
 
     if (fullUrl == null)

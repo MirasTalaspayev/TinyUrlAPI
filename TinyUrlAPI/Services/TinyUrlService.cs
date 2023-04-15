@@ -3,6 +3,7 @@ using Microsoft.Extensions.Caching.Distributed;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using TinyUrlAPI.Models;
+using ZstdSharp.Unsafe;
 
 namespace TinyUrlAPI.Services;
 public class TinyUrlService
@@ -22,22 +23,30 @@ public class TinyUrlService
         _cache = cache;
     }
 
-    public TinyUrlModel GetShortUrlScheme(string url)
+    public string GetShortUrlScheme(string fullUrl)
     {
+        var shortUrl = _cache.GetString(fullUrl);
+        if (shortUrl != null)
+        {
+            Console.WriteLine(shortUrl + " is taken from cache");
+            return shortUrl;
+        }
+
         var collection = _database.GetCollection<TinyUrlModel>("TinyUrl");
-        var filter = Builders<TinyUrlModel>.Filter.Eq("FullUrl", url);
+        var filter = Builders<TinyUrlModel>.Filter.Eq("FullUrl", fullUrl);
         
         var tinyUrl = collection.Find(filter).FirstOrDefault();
 
         if (tinyUrl != null)
         {
-            return tinyUrl;
+            return tinyUrl.ShortUrl;
         }
 
-        tinyUrl = _urlShortener.ShortenUrl(url);
+        tinyUrl = _urlShortener.ShortenUrl(fullUrl);
         collection.InsertOne(tinyUrl);
 
-        return tinyUrl;
+        _cache.SetString(fullUrl, tinyUrl.ShortUrl);
+        return tinyUrl.ShortUrl;
     }
 
     public string GetFullUrl(string shortUrl)
