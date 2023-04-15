@@ -16,7 +16,7 @@ namespace TinyUrlAPI.Controllers
             _urlService = urlService;
         }
         [HttpPost]
-        public TinyUrlModel PostUrl([FromBody] UrlModel url)
+        public string PostUrl([FromBody] UrlModel url)
         {
             return _urlService.GetShortUrlScheme(url.Url);
         }

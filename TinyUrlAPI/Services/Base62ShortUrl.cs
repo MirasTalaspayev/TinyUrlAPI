@@ -1,4 +1,5 @@
-﻿using TinyUrlAPI.Models;
+﻿using System.Drawing;
+using TinyUrlAPI.Models;
 
 namespace TinyUrlAPI.Services;
 public class Base62ShortUrl : IUrlShortener
@@ -6,7 +7,11 @@ public class Base62ShortUrl : IUrlShortener
     private static HashSet<int> counters = new HashSet<int>();
     private static readonly char[] map = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789".ToCharArray();
     private static readonly Random random = new Random();
-
+    private readonly BaseUrlService _baseUrlService;
+    public Base62ShortUrl(BaseUrlService baseUrlService)
+    {
+        _baseUrlService = baseUrlService;
+    }
     public TinyUrlModel ShortenUrl(string url)
     {
         return new TinyUrlModel() { FullUrl = url, ShortUrl = IdToShortUrl() };
@@ -31,7 +36,7 @@ public class Base62ShortUrl : IUrlShortener
             n /= 62;
         }
 
-        return Reverse(shorturl);
+        return _baseUrlService.GetBaseUrl() + Reverse(shorturl);
     }
     private string Reverse(string input)
     {
