@@ -3,8 +3,8 @@ FROM mcr.microsoft.com/dotnet/sdk:6.0-focal as build
 WORKDIR /source
 COPY . .
 
-RUN dotnet restore "./TinyUrlAPI/TinyUrlAPI.csproj" --disable-parallel
-RUN dotnet publish "./TinyUrlAPI/TinyUrlAPI.csproj" -c release -o /app --no-restore
+RUN dotnet restore "./TinyUrlAPI.csproj" --disable-parallel
+RUN dotnet publish "./TinyUrlAPI.csproj" -c release -o /app --no-restore
 
 # Serve Stage
 
