@@ -1,6 +1,6 @@
 To build docker image:
 ```
-docker build -t tinyurlapi-test:latest . 
+docker build -t tinyurlapi:latest . 
 ```
 To run tinyurlapi container:
 ```
